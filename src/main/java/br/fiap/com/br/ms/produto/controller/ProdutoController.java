@@ -6,14 +6,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/produto")
+@RequestMapping("/produtos")
 public class ProdutoController {
 
     @GetMapping
-    public ResponseEntity<ProdutoResponseDTO> getProduto(){
+    public ResponseEntity<List<ProdutoResponseDTO>> getProduto(){
 
-        ProdutoResponseDTO dto = ProdutoResponseDTO.creaMock();
+        List<ProdutoResponseDTO> dto = ProdutoResponseDTO.creaMock();
         return ResponseEntity.ok(dto);
     }
 }

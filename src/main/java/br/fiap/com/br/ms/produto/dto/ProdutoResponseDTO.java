@@ -1,5 +1,7 @@
 package br.fiap.com.br.ms.produto.dto;
 
+import java.util.List;
+
 public class ProdutoResponseDTO {
 
     private Long id;
@@ -14,10 +16,15 @@ public class ProdutoResponseDTO {
         this.valor = valor;
     }
 
-    public static ProdutoResponseDTO creaMock(){
+    public static List<ProdutoResponseDTO> creaMock(){
 
-        ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(1L,"Smart Tv","Smart TV de 38 polegadas",2000.0);
-        return responseDTO;
+        return List.of(
+          new ProdutoResponseDTO(1L,"Smart Tv","Smart TV de 38 polegadas",2000.0),
+        new ProdutoResponseDTO(2L,"Notebook Dell","Notebook Dell i7 16GB RAM",5200.0)
+        );
+
+//        ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(1L,"Smart Tv","Smart TV de 38 polegadas",2000.0);
+//        return responseDTO;
     }
 
 
