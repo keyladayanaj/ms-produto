@@ -1,10 +1,9 @@
 package br.fiap.com.br.ms.produto.controller;
 
+import br.fiap.com.br.ms.produto.dto.ProdutoInputDTO;
 import br.fiap.com.br.ms.produto.dto.ProdutoResponseDTO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,5 +16,13 @@ public class ProdutoController {
 
         List<ProdutoResponseDTO> dto = ProdutoResponseDTO.creaMock();
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping
+    public  ResponseEntity<ProdutoResponseDTO> createProduto(@RequestBody ProdutoInputDTO inputDTO){
+
+        ProdutoResponseDTO dto = new ProdutoResponseDTO(1L,inputDTO.getNome(),inputDTO.getDescricao(),inputDTO.getValor());
+        return ResponseEntity.created(null).body(dto);
+
     }
 }
