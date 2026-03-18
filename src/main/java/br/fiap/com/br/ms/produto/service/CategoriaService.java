@@ -2,11 +2,14 @@ package br.fiap.com.br.ms.produto.service;
 
 import br.fiap.com.br.ms.produto.dto.CategoriaDTO;
 import br.fiap.com.br.ms.produto.entities.Categoria;
+import br.fiap.com.br.ms.produto.exceptions.DatabaseException;
 import br.fiap.com.br.ms.produto.exceptions.ResourceNotException;
 import br.fiap.com.br.ms.produto.repository.CategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -59,12 +62,17 @@ public class CategoriaService {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.SUPPORTS)
     public void deleteCategoriaById(Long id){
         if(!categoriaRepository.existsById(id)){
             throw new ResourceNotException("Recurso não encontrado. ID: " + id);
         }
 
-        categoriaRepository.deleteById(id);
+        try {
+            categoriaRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Não foi possível excluir a categoria. " +
+                    "Existem produtos associados a ela.");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package br.fiap.com.br.ms.produto.exceptions.handler;
 
+import br.fiap.com.br.ms.produto.exceptions.DatabaseException;
 import br.fiap.com.br.ms.produto.exceptions.ResourceNotException;
 import br.fiap.com.br.ms.produto.exceptions.dto.CustomErrorDTO;
 import br.fiap.com.br.ms.produto.exceptions.dto.ValidationErrorDTO;
@@ -82,5 +83,15 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<CustomErrorDTO> handleDatabase(DatabaseException e,
+                                                         HttpServletRequest request) {
+
+        HttpStatus status = HttpStatus.CONFLICT; //409
+        CustomErrorDTO err = new CustomErrorDTO(Instant.now(), status.value(),
+                e.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
 
 }

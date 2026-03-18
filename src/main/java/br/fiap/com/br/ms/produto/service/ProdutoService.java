@@ -3,11 +3,13 @@ package br.fiap.com.br.ms.produto.service;
 import br.fiap.com.br.ms.produto.dto.ProdutoDTO;
 import br.fiap.com.br.ms.produto.entities.Categoria;
 import br.fiap.com.br.ms.produto.entities.Produto;
+import br.fiap.com.br.ms.produto.exceptions.DatabaseException;
 import br.fiap.com.br.ms.produto.exceptions.ResourceNotException;
 import br.fiap.com.br.ms.produto.repository.CategoriaRepository;
 import br.fiap.com.br.ms.produto.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
@@ -42,11 +44,16 @@ public class ProdutoService {
     @Transactional
     public ProdutoDTO saveProduto(ProdutoDTO produtoDTO) {
 
-        Produto produto = new Produto();
-        //metodo auxiliar para converter DTO para Entidade Produto
-        copyDtoToProduto(produtoDTO, produto);
-        produto = produtoRepository.save(produto);
-        return new ProdutoDTO(produto);
+        try {
+            Produto produto = new Produto();
+            //metodo auxiliar para converter DTO para Entidade Produto
+            copyDtoToProduto(produtoDTO, produto);
+            produto = produtoRepository.save(produto);
+            return new ProdutoDTO(produto);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Não foi possível salvar Produto. Categoria inexixtente " +
+                    " (ID: " + produtoDTO.getCategoria().getId() + ")");
+        }
     }
 
     private void copyDtoToProduto(ProdutoDTO produtoDTO, Produto produto) {
