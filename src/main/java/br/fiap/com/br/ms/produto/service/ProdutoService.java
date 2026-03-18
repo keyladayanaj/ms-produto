@@ -1,14 +1,16 @@
 package br.fiap.com.br.ms.produto.service;
 
 import br.fiap.com.br.ms.produto.dto.ProdutoDTO;
+import br.fiap.com.br.ms.produto.entities.Categoria;
 import br.fiap.com.br.ms.produto.entities.Produto;
+import br.fiap.com.br.ms.produto.exceptions.ResourceNotException;
+import br.fiap.com.br.ms.produto.repository.CategoriaRepository;
 import br.fiap.com.br.ms.produto.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.EntityFilterException;
-import org.hibernate.action.internal.EntityActionVetoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
 
@@ -17,6 +19,9 @@ public class ProdutoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @Transactional(readOnly = true)
     public List<ProdutoDTO> finAllProdutos(){
@@ -28,7 +33,7 @@ public class ProdutoService {
     public  ProdutoDTO finProdutoById(Long id){
 
         Produto produto = produtoRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Recurso não encontrado. ID: "+ id)
+                () -> new ResourceNotException("Recurso não encontrado. ID: " + id)
         );
 
         return new ProdutoDTO(produto);
@@ -49,6 +54,13 @@ public class ProdutoService {
         produto.setNome(produtoDTO.getNome());
         produto.setDescricao(produtoDTO.getDescricao());
         produto.setValor(produtoDTO.getValor());
+
+        Categoria categoria = categoriaRepository.findById(produtoDTO.getCategoria().getId())
+                .orElseThrow(() -> new ResourceNotException(
+                        "Categoria não encontrada. ID: " + produtoDTO.getCategoria().getId()
+                ));
+
+        produto.setCategoria(categoria);
     }
 
     @Transactional
@@ -60,7 +72,7 @@ public class ProdutoService {
             produto = produtoRepository.save(produto);
             return new ProdutoDTO(produto);
         } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException("Recurso não encontrado. ID: " + id);
+            throw new ResourceNotException("Recurso não encontrado. ID: " + id);
         }
     }
 
@@ -68,7 +80,7 @@ public class ProdutoService {
     public void deleteProdutoById(Long id) {
 
         if (!produtoRepository.existsById(id)) {
-            throw new EntityNotFoundException("Recurso não encontrado. ID: " + id);
+            throw new ResourceNotException("Recurso não encontrado. ID: " + id);
         }
 
         produtoRepository.deleteById(id);
